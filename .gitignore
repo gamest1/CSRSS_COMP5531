@@ -1,0 +1,13 @@
+.DS_Store
+
+*.swp
+
+*.lock
+
+profile
+
+sftp-config.json
+
+*.sublime-project
+
+*.sublime-workspace
