@@ -9,25 +9,28 @@ class MenuSearchPartsController {
         $this->model = new Parts();
     } 
 
-    public function renderMainView()
+    public function renderMainView($partID,$part_type)
 	{           
-					$parts = $this->model->getAllParts();
 					include '../views/searchPartsView.php';
 					return;
 	}
-
 }
 
 session_start();
 
 if (!isset($_SESSION['employeeID'])) {
-    $message = "You must login first in order to logout! Hehe...";
-	include '../views/loginView.php';
-	return;
+    $message = "You must login first";
+    include '../views/loginView.php';
+    return;
 }
 else {
 	$controller = new MenuSearchPartsController();
-	$controller->renderMainView();
+	if(isset($_GET['partID']) && isset($_GET['part_type'])) {	
+     $controller->renderMainView($_GET['partID'],$_GET['part_type']); 
+	}
+    else {
+	 $controller->renderMainView("","");
+	} 
 }
 
 ?>

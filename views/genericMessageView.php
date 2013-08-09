@@ -20,7 +20,8 @@ include("viewtopbar.php");
   <div class="row-fluid">
     <div class="span2">
       <!--Sidebar content-->
-      <? include("viewmenu.php"); ?>
+      <?  $activeIndex = -1; 
+          include("viewmenu.php"); ?>
 
 
     </div>

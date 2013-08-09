@@ -12,20 +12,58 @@ else {
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
               <li class="nav-header">General</li>
-              <li class="active"><a href="../controllers/menuMainController.php">New Sale, Upgrade, or Repair</a></li>
-              <li><a href="../controllers/menuSearchPartsController.php">Search Part</a></li>
-              <li><a href="#">Device History</a></li>
-              <li><a href="#">Inventory</a></li>
-              <li><a href="#">Update/Add Part</a></li>
-              <? 
+
+              <? for($i=0;$i<5;$i++) {
+
+                 if($i==$activeIndex) echo '<li class="active">';
+                 else echo '<li>';
+
+                 switch($i) {
+                  case 0:
+                     echo '<a href="../controllers/menuMainController.php">New Sale, Upgrade, or Repair</a></li>';
+                     break;
+                  case 1:
+                     echo '<a href="../controllers/menuSearchPartsController.php">Search Part</a></li>';
+                     break;
+                  case 2:
+                     echo '<a href="../controllers/menuDeviceHistoryController.php">Device History</a></li>';
+                     break; 
+                  case 3:
+                     echo '<a href="../controllers/menuInventoryController.php">Inventory</a></li>';
+                     break;
+                  case 4:
+                     echo '<a href="../controllers/menuUpdatePartsController.php">Update/Add Part</a></li>';
+                     break;        
+                 }
+
+              }
+
               if($_SESSION['isAdmin'] == 1) { 
-              ?>
-              <li class="nav-header">Admin</li>
-              <li><a href="#">Payments</a></li>
-              <li><a href="#">Update/Add Employees</a></li>
-              <li><a href="#">Employee Report</a></li>
-              <li><a href="#">Store Report</a></li>
-              <? 
+
+               echo '<li class="nav-header">Admin</li>';
+
+               for($i=10;$i<14;$i++) {
+
+                 if($i==$activeIndex) echo '<li class="active">';
+                 else echo '<li>';
+
+                 switch($i) {
+                  case 10:
+                     echo '<a href="../controllers/menuPaymentsController.php">Payments</a></li>';
+                     break;
+                  case 11:
+                     echo '<a href="../controllers/menuUpdateEmployeesController.php">Update/Add Employees</a></li>';
+                     break;
+                  case 12:
+                     echo '<a href="../controllers/menuEmployeeReportController.php">Employee Report</a></li>';
+                     break; 
+                  case 13:
+                     echo '<a href="../controllers/menuStoreReportController.php">Store Report</a></li>';
+                     break;       
+                 }
+
+              }  
+              
               } 
               ?>
             </ul>

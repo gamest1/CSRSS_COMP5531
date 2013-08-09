@@ -30,7 +30,8 @@ for($i=0;$i<count($parts['ids']);$i++) {
   <div class="row-fluid">
     <div class="span2">
       <!--Sidebar content-->
-      <? include("viewmenu.php"); ?>
+      <?  $activeIndex = 0;
+          include("viewmenu.php"); ?>
 
 
     </div>
@@ -108,6 +109,7 @@ for($i=0;$i<count($parts['ids']);$i++) {
         <input type="text" placeholder="Enter the cost of this type of service" class="ctrl-textbox" id="partCostVal" name="partCostVal">
       </div>
 
+
     </div>
 
     </div>
@@ -132,6 +134,11 @@ for($i=0;$i<count($parts['ids']);$i++) {
         </div>
       </div> -->
 
+      <div id="ajaxLoad" style="display: none;">
+            <label class="control-label">Please wait while we run your query...</label>
+            <img src="../assets/img/ajax-loader.gif" alt="Please wait..." height="32" width="32">
+      </div>
+      
       <div class="droppedField">
         <label class="control-label">Details of this Service</label>
        <textarea rows="4" cols="290" name="serviceDetail" style="width: 450px"></textarea>

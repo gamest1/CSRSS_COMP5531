@@ -3,6 +3,25 @@
 class Service {
 
 
+	function getAllDevices()
+	{
+		$tmp = array();
+		$link = mysql_connect("clipper.encs.concordia.ca", "kxc55311", "gamest11") or die ('DB Server: Error connecting to the database!');
+		mysql_select_db("kxc55311",$link);
+
+		 $query = "select d_name from CSRSS_Devices";
+		 $result = mysql_query($query,$link);
+
+		 if(!$result) return false;
+
+            $i = 0;
+  		 	while ($record = mysql_fetch_array($result,MYSQL_ASSOC)) {
+  		 		$tmp[$i++] = $record['d_name'];
+  			}
+
+  		return $tmp;	
+	}
+
 	function insertNewDevice($deviceName,$description,$owner)
 	{
 		$link = mysql_connect("clipper.encs.concordia.ca", "kxc55311", "gamest11") or die ('DB Server: Error connecting to the database!');
