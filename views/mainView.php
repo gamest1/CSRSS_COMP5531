@@ -144,6 +144,43 @@ for($i=0;$i<count($parts['ids']);$i++) {
        <textarea rows="4" cols="290" name="serviceDetail" style="width: 450px"></textarea>
       </div>
 
+      <div class="droppedField" id="checkboxDIV" style="display: none;">
+       <label class="control-label">Mock an online sale</label>
+       <input type="checkbox" name="onlineCheckbox" id="onlineCheckbox" value="online">This is a on-line sale<br>
+      </div>     
+
+      <div id="onlineSaleDIV" style="display: none;">
+
+      <div class="droppedField">
+        <label class="control-label">City</label>
+        <input type="text" placeholder="Destination city" class="ctrl-textbox" id="city" name="city">
+      </div>
+
+      <div class="droppedField">
+        <label class="control-label">Province</label>
+        <input type="text" placeholder="Destination province" class="ctrl-textbox" id="province" name="province">
+      </div>
+
+      <div class="droppedField">
+        <label class="control-label">Country</label>
+        <input type="text" placeholder="Destination country" class="ctrl-textbox" id="country" name="country">
+      </div>
+
+      <div class="droppedField">
+        <label class="control-label">Address</label>
+       <textarea rows="2" cols="240" name="address" style="width: 450px"></textarea>
+      </div>
+
+      <div class="droppedField">
+            <label class="control-label">Date shipped:</label>
+             <div class="input-append date" id="dateShippedPicker" data-date="<? echo $today; ?>" data-date-format="yyyy-mm-dd">
+                <input class="span12" size="16" type="text" value="<? echo $today; ?>" readonly="" name="dateShipped" id="dateShipped">
+                <span class="add-on"><i class="icon-calendar"></i></span>
+            </div>
+      </div>
+
+      </div>
+
       <div class="droppedField">
         <button class="btn btn-primary ctrl-btn" name="createServiceButton" style="float:right;" type="submit">Create this Service Instance</button>
       </div>

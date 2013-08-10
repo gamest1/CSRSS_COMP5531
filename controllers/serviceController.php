@@ -1,6 +1,12 @@
 <?php
 include_once("../models/service.php");
 
+function trim_value(&$value)
+{
+    $value = trim($value);    // this removes whitespace and related characters from the beginning and end of the string
+    $value = stripslashes($value);
+}
+
 class ServiceController {
 	public $model;
 	
@@ -34,15 +40,39 @@ else
 {   
 	$controller = new ServiceController();
     $message = "Processing your request...";
-	$type = $_POST['serviceType'];
 
-    if($type == "sale") {
-       $where = $_POST['partSelector'];
+    array_filter($_POST, 'trim_value');
+    $postfilter =    // set up the filters to be used with the trimmed post array
+    array(
+        'partID' => array('filter' => FILTER_SANITIZE_NUMBER_INT), 
+        'serviceType' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),
+        'partSelector' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH), 
+        'partName' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),  
+        'serviceDetail' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_NO_ENCODE_QUOTES), 
+        'partCostVal' => array('filter' => FILTER_SANITIZE_NUMBER_FLOAT, 'flags' => FILTER_FLAG_ALLOW_FRACTION),
+        'serviceCostVal' => array('filter' => FILTER_SANITIZE_NUMBER_FLOAT, 'flags' => FILTER_FLAG_ALLOW_FRACTION),
+        'city' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),
+        'province' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),
+        'country' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),
+        'address' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_NO_ENCODE_QUOTES),
+        'dateShipped' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),
+        'deviceSelect' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),
+        'newDeviceName' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),
+        'newDeviceOwner' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH),
+        'newDeviceDescription' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_NO_ENCODE_QUOTES)
+    );
+
+    $post_array = filter_var_array($_POST, $postfilter);    // must be referenced via a variable which is now an array that takes the place of $_POST[]
+
+	   $type = $post_array['serviceType'];
+
+       if($type == "sale") {
+       $where = $post_array['partSelector'];
         if ($where == 'byName') {
-        	$partID = $_POST['partName'];
+        	$partID = $post_array['partName'];
         }
         else if ($where == 'byPart') {
-			$partID = $_POST['partID'];
+			$partID = $post_array['partID'];
         }
         else {
 			$message = "Controller called without real sale type! Exiting...";
@@ -51,24 +81,26 @@ else
         }
 
         //Now we have the PartID, process this sale:
-        $cost = $_POST['partCostVal'];
-        $detail = $_POST['serviceDetail'];
+        $cost = $post_array['partCostVal'];
+        $detail = $post_array['serviceDetail'];
+
+        $city = $post_array['city'];
+        $province = $post_array['province'];
+        $country = $post_array['country'];
+        $address = $post_array['address'];
+        $dateShipped = $post_array['dateShipped'];
 
 		//Process this new sale:
-		$message = $controller->model->processSale($partID,$cost,$detail);
-		// ob_start();
-		// 	var_dump($_POST);
-		// $message = ob_get_clean();
+		$message = $controller->model->processSale($partID,$cost,$detail,$city,$province,$country,$address,$dateShipped);
          
     }
     else if($type == "upgrade" || $type == "repair") {
-        $device = $_POST['deviceSelect'];
+        $device = $post_array['deviceSelect'];
         if($device == "0") {
         	//New Device!
-        	$newName = $_POST['newDeviceName'];
-        	$description = $_POST['newDeviceDescription'];
-			$owner = $_POST['newDeviceOwner'];
-            //Do some sanitization here!! This is dangerous:
+        	$newName = $post_array['newDeviceName'];
+        	$description = $post_array['newDeviceDescription'];
+			$owner = $post_array['newDeviceOwner'];
             
             //Process insertion of new device:
 			if($controller->model->insertNewDevice($newName,$description,$owner)) {
@@ -84,32 +116,32 @@ else
         //Now you have the $device, process this upgrade or repair:
 		if($type == "upgrade") {
         	
-        	$detail = $_POST['serviceDetail'];	
-     		$where = $_POST['partSelector'];
+        	$detail = $post_array['serviceDetail'];	
+     		$where = $post_array['partSelector'];
      		$partID = "";
 			if ($where == 'byName') {
-        		$partID = $_POST['partName'];
+        		$partID = $post_array['partName'];
         	}
         	else if ($where == 'byPart') {
-				$partID = $_POST['partID'];
+				$partID = $post_array['partID'];
        		}
 
 			$message = "";
             if($partID!="") {
             	//Yes, there is a sale within this upgrade! Process it:
-	        	$partcost = $_POST['partCostVal'];
+	        	$partcost = $post_array['partCostVal'];
     			$message = $controller->model->processSale($partID,$partcost,$detail);
             }
 
-			$servicecost = $_POST['serviceCostVal'];
+			$servicecost = $post_array['serviceCostVal'];
 			//Process the Upgrade part:
         	$message .= $controller->model->processUpgradeRepair($device,$servicecost,$detail,$type);
 
 		}
         else if($type == "repair") {
 
-        	 $servicecost = $_POST['serviceCostVal'];
-       		 $detail = $_POST['serviceDetail'];
+        	 $servicecost = $post_array['serviceCostVal'];
+       		 $detail = $post_array['serviceDetail'];
 
         	//Process this new repair:
        		 $message .= $controller->model->processUpgradeRepair($device,$servicecost,$detail,$type);

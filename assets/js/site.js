@@ -2,14 +2,221 @@ function loadDatePickers() {
       $('#purchaseDatePicker').datepicker();
       $('#paymentBeginPicker').datepicker();
       $('#paymentEndPicker').datepicker();
+      $('#firstDayPicker').datepicker();
+	  $('#dailyActivityPicker').datepicker();
+	  $('#intervalPickerBegin').datepicker();
+	  $('#intervalPickerEnd').datepicker();
+	  $('#dateShippedPicker').datepicker();
+	  $("input[type=checkbox]").change(function(e) {
+    	if ($('#onlineCheckbox').is(':checked') ) {
+    		$('#onlineSaleDIV').show();
+    	} 
+    	else {
+			$('#onlineSaleDIV').hide();
+    	}
+
+	  });
 }
 
-function check10digits() {
-	if( $('#newPartID').val().length == 10 ) {
+function fetchStoreReport(caller) {
+	if( $(caller).val() == "both" ) {
+		$('#inStoreRow').show();
+        $('#onlineRow').show();                     
+	}
+	else if( $(caller).val() == "online" ) {
+		$('#inStoreRow').hide();
+        $('#onlineRow').show();                     
+	}
+	else if( $(caller).val() == "instore" ) {
+		$('#inStoreRow').show();
+        $('#onlineRow').hide();                     
+	}
+	else {
+		$('#inStoreRow').hide();
+        $('#onlineRow').hide();
+	}
+
+	var dateString1 = $('#intervalBegin').val();
+	var dateString2 = $('#intervalEnd').val();
+
+	var postData = {
+    	action: "getStoreReport",
+    	dateBeg: dateString1,
+    	dateEnd: dateString2
+	 };
+
+	 
+	 $('#ajaxLoad').show();
+
+	 $.post("https://clipper.encs.concordia.ca/~kxc55311/models/ajax.php", postData,
+  	   function(data){
+    	
+      $('#ajaxLoad').hide();
+
+	  var results = data.report;
+
+	  var keys = [];
+	  for(var key in results) {
+  			if(results.hasOwnProperty(key)) { //to be safe
+      			keys.push(key);
+  	  		}
+	  }
+
+
+	  var lim = keys.length;
+
+	  var instoreReport = "<h3>INSTORE REPORT</h3><p>This report includes revenues for sales, upgrades and repairs done at the store:</p><p>";
+	  var onlineReport = "<h3>ONLINE REPORT</h3><p>This report includes revenues from online sales only:</p>";
+
+	  for(var i=0;i<lim;i++) { 
+	  		var thisKey = keys[i];
+	  		var amount = results[keys[i]];
+
+	  		switch(thisKey)
+			{
+				case "other":
+				case "sales":
+  					instoreReport += thisKey.toUpperCase() + " REVENUE: <b>$" + amount + "</b> on the selected period <br />";
+  					break;
+  				case "online":
+  					onlineReport += thisKey.toUpperCase() + " REVENUE: <b>$" + amount + "</b> on the selected period <br />";
+  					break;	
+			}
+	  }
+
+		$('#instoreReport').html(instoreReport + "</p>");
+		$('#onlineReport').html(onlineReport + "</p>");
+
+  	  }, "json");
+
+}
+
+function checkEmployeeSelection(caller) {
+
+	if( $(caller).val() == "" ) {
+		$('#submitButton').hide();
+		$('#employeeReport').html("<div class=\"alert alert-error\">Please select an employee ID</div>");                             
+	}
+	else {
+		$('#submitButton').show();
+		$('#employeeReport').html("<div class=\"alert alert-info\">Click on the blue button above to generate this report</div>");  
+	}
+
+}
+
+function fetchEmployeeReport() {
+	var dateString1 = $('#intervalBegin').val();
+	var dateString2 = $('#intervalEnd').val();
+	var theEmployee = $('#employeeID').val();
+
+	var postData = {
+    	action: "getServiceHistoryForEmployee",
+    	employee: theEmployee,
+    	dateBeg: dateString1,
+    	dateEnd: dateString2
+	 };
+
+   	$('#ajaxLoad').show();
+
+	$.post("https://clipper.encs.concordia.ca/~kxc55311/models/ajax.php", postData,
+  	   function(data){
+    	
+      $('#ajaxLoad').hide();
+
+	  var results = data.historia;
+	  var lim = results.length;
+
+	  if(lim > 0) {
+   	 	var tableView = '<table class="table table-striped table-bordered table-hover">';
+		tableView += "<tr><th>Service ID</th><th>Type of service</th><th>Date</th><th>Total paid</th><th>Owed to employee</th><th>Details</th></tr>";
+
+		for(var i=0;i<lim;i++) { 
+				var row = "";
+                var rowHash = results[i];
+                var employee = rowHash['employeeID'];
+
+                row += "<tr>";
+                row += '<td>' + rowHash['serviceID'] + "</td>";
+                row += '<td>' + rowHash['type'] + "</td>";
+                row += '<td>' + rowHash['date'] + "</td>";
+				row += '<td>' + rowHash['amount_paid'] + "</td>";
+				row += '<td>' + rowHash['amount_employee'] + "</td>";
+				row += '<td>' + rowHash['details'] + "</td>";
+                row += "</tr>";
+
+                tableView += row;    
+		}
+   	 	$('#employeeReport').html(tableView);
+   	  }
+   	  else {
+   	  	$('#employeeReport').html("<h3>There is no activity for this employee for the period you selected!<h3>");
+   	  } 
+
+  	  }, "json");
+
+}
+ 
+
+function fetchDailyActivity() {
+	var dateString = $('#dailyActivityDay').val();
+
+	var postData = {
+    	action: "fetchDailyActivityForDay",
+    	date: dateString
+	 };
+
+   	$('#ajaxLoad').show();
+
+	$.post("https://clipper.encs.concordia.ca/~kxc55311/models/ajax.php", postData,
+  	   function(data){
+    	
+      $('#ajaxLoad').hide();
+
+	  var results = data.activity;
+	  var lim = results.length;
+
+	  if(lim > 0) {
+   	 	var tableView = '<table class="table table-striped table-bordered table-hover">';
+		tableView += "<tr><th>Service ID</th><th>Type of service</th><th>Performed by</th><th>Amount</th><th>Details</th></tr>";
+
+		for(var i=0;i<lim;i++) { 
+				var row = "";
+                var rowHash = results[i];
+                var employee = rowHash['employeeID'];
+
+                row += "<tr>";
+                row += '<td>' + rowHash['serviceID'] + "</td>";
+                row += '<td>' + rowHash['type'] + "</td>";
+				row += "<td><a href=\"menuUpdateEmployeesController.php?employeeID=" + employee + '">' + employee + "</a></td>";
+				row += '<td>' + rowHash['amount'] + "</td>";
+				row += '<td>' + rowHash['details'] + "</td>";
+                row += "</tr>";
+
+                tableView += row;    
+		}
+   	 	$('#dailyReport').html(tableView);
+   	  }
+   	  else {
+   	  	$('#dailyReport').html("<h3>There is no activity for the date you selected!<h3>");
+   	  } 
+
+  	  }, "json");
+
+}
+
+function checkDigits(num,object) {
+
+	if( $(object).val().length == num ) {
 		$('#firstButton').removeAttr("disabled");                             
 	}	
 	else { 
 		$('#firstButton').attr("disabled", "disabled");
+
+		//
+		$('#loginInfo').hide();
+		$('#employeeInfo').hide();
+
+		$('#firstButton').show();
 	}	
 }
 
@@ -158,8 +365,6 @@ function sendCode(caller) {
    	$('#ajaxLoad').show();
 	$('#alert').remove();
 
-	alert("" + tmp+ "CODE: "+ tmp1 + " " + tmp2+ tmp3);
-
 	$.post("https://clipper.encs.concordia.ca/~kxc55311/models/ajax.php", postData,
   	   function(data){
     	
@@ -167,7 +372,6 @@ function sendCode(caller) {
 
    	 	var resp = data.string;
 
-   	 	alert(resp);
    	 	if (resp == "SUCCESS") {
    	 		location.reload();
    	 	}
@@ -194,14 +398,20 @@ function mainViewCheckServiceType() {
 	 	if (tmp == "repair") {
 			$('#serviceCostVal').val(data.repair);
 			$('#partCostVal').val("");
+			$('#checkboxDIV').hide();
 	 	}
 	 	else if (tmp == "sale") {
 	 		$('#partCostVal').val(data.sale);
 	 		$('#serviceCostVal').val("");
+	 		$('#checkboxDIV').show();
 	 	}
 	 	else if (tmp == "upgrade") {
 	 		$('#serviceCostVal').val(data.upgrade);
 	 		$('#partCostVal').val("0");
+	 		$('#checkboxDIV').hide();
+	 	}
+	 	else {
+	 		$('#checkboxDIV').hide();
 	 	}
 
   	  }, "json");
@@ -293,6 +503,7 @@ function mainViewCheckDeviceName() {
 
 function updateViewFirstCheck(caller) {
 
+//updatePartsView:
 	 $('#inventoryInfo').hide();
 	 $('#partInfo').hide();				
 	 $('#computerInfo').hide();
@@ -300,11 +511,17 @@ function updateViewFirstCheck(caller) {
 	 $('#laptopInfo').hide();
 	 $('#newButton').hide();
 	 $('#updateButton').hide();
+//updateEmployeesView:
+	 $('#employeeInfo').hide();
+	 $('#loginInfo').hide();
+	 $('#employeesInfoTable').hide(); 
 	 
+
 	if($("#alert").get(0)) {
 		$('#alert').remove();
 	}
 	else {
+	//updatePartsView:	
 	       $('#partName').val('');
            $('#description').val('');
            $('#cost').val('');
@@ -332,23 +549,122 @@ function updateViewFirstCheck(caller) {
       			$('#screen_size').val('');
         		$('#battery_life').val('');
         		$('#battery_specs').val('');
+     //updateEmployeesView:
+     		$('#firstName').val('');
+        	$('#lastName').val('');
+        	$('#online_fee').val('');
+        	$('#service_fee').val('');
+        	$('#base_salary').val('');
+        	$('#phone').val('');
+        	$('#address').val('');
+        	$('#isAdmin').val('');
      }   		
 
 	 if(caller == "new") {
+	 //updatePartsView:	
 		$('#newPartIDDIV').show();
 		$('#partIDDIV').hide();
 		$('#partID option:eq(0)').prop('selected', true);
+	//updateEmployeesView:
+		$('#newEmployeeIDDIV').show();
+		$('#employeeIDDIV').hide();
+		$('#employeeID option:eq(0)').prop('selected', true);
+
 		$('#firstButton').show();
+
+		$('#serviceFeeDIV').val('');
+		$('#serviceFeeDIV').hide();
+		$('#lastLoginDIV').hide();
+		
+		$('#username').removeAttr("disabled");
 	 }
 	 else if(caller == "update") {
+	 //updatePartsView:	
 	 	$('#newPartID').val('');
 		$('#newPartIDDIV').hide();
 		$('#partCategoryDIV').hide();
 		$('#partIDDIV').show();
 		$('#partCategory option:eq(0)').prop('selected', true);
+	//updateEmployeesView:	
+		$('#newEmployeeID').val('');
+		$('#newEmployeeIDDIV').hide();
+		$('#employeeIDDIV').show();
+
 		$('#firstButton').hide();
+
+		$('#serviceFeeDIV').show();
+		$('#lastLoginDIV').show();
+
+		$('#username').attr("disabled", "disabled");
 	}
 
+}
+
+function updateEmployeeFetchAll() {
+
+     var tmp = $('#employeeID').val();
+     if( tmp == "all" ) {
+	 	$('#employeesInfoTable').show();
+	 	$('#Row1').hide();
+	 }
+	 else {
+
+		$('#employeesInfoTable').hide();
+	 	$('#Row1').show();
+
+	 var postData = {
+    	action: "getAllInfoForEmployee",
+    	employeeID: tmp
+	 };
+
+     $('#ajaxLoad').show();
+
+		   $('#firstName').val('');
+        	$('#lastName').val('');
+        	$('#online_fee').val('');
+        	$('#service_fee').val('');
+        	$('#base_salary').val('');
+        	$('#phone').val('');
+        	$('#address').val('');
+        	$('#isAdmin').val('');
+
+	 $.post("https://clipper.encs.concordia.ca/~kxc55311/models/ajax.php", postData,
+  	   function(data){
+
+	  	   	$('#ajaxLoad').hide();
+
+			$('#loginInfo').show();
+			$('#employeeInfo').show();
+
+            var submitType = $('input:radio[name=employeeSelector]:checked').val();
+            if(submitType == "new") {
+				$('#newButton').show();
+				$('#updateButton').hide();
+            }
+            else if(submitType == "update") {
+				$('#newButton').hide();
+				$('#updateButton').show();
+            } 
+
+	  	   	//Now that you have all the info, populate all the fields:
+           $('#username').val(data.username);
+           $('#last_login').val(data.last_login);
+
+           $('#online_fee').val(data.online_fee);
+           $('#service_fee').val(data.service_fee);
+           $('#isAdmin').val(data.isAdmin);
+           $('#firstName').val(data.firstName);
+           $('#lastName').val(data.lastName);
+
+           $('#firstDayPicker').datepicker('setValue', data.first_day_of_work);
+
+           $('#base_salary').val(data.base_salary);
+           $('#address').val(data.address);
+           $('#phone').val(data.phone);
+
+
+  	  }, "json"); 
+	}
 }
 
 function updateViewFetchAll() {
@@ -464,15 +780,37 @@ function updateViewFetchAll() {
            $('#numberAvailable').val(data.numberAvailable);
            $('#wholePrice').val(data.whole_price);
 
-
-
   	  }, "json"); 
-
-
 }
 
-function createNewPartID() {
+function createNewID() {
+//updatePartsView:
 	$('#partCategoryDIV').show();
+//updateEmployeesView:	
+	$('#loginInfo').show();
+	$('#employeeInfo').show();
+
+	var submitType = $('input:radio[name=employeeSelector]:checked').val();
+            if(submitType == "new") {
+				$('#newButton').show();
+				$('#updateButton').hide();
+
+				$('#serviceFeeDIV').val('');
+				$('#serviceFeeDIV').hide();
+				$('#lastLoginDIV').hide();
+
+				$('#username').removeAttr("disabled");
+            }
+            else if(submitType == "update") {
+				$('#newButton').hide();
+				$('#updateButton').show();
+
+				$('#serviceFeeDIV').show();
+				$('#lastLoginDIV').show();
+
+				$('#username').attr("disabled", "disabled");
+            } 
+
 	$('#firstButton').hide();
 }
 

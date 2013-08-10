@@ -13,8 +13,8 @@
             </p>
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li><a href="../controllers/changePasswordController.php">Change your password</a></li>
+              <li><a href="../controllers/aboutController.php">About this project</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>

@@ -10,6 +10,114 @@ class Employees {
         $this->db = $link;
     }
 
+	function getAllEmployeesInfo()
+	{
+		 $answer = array();
+
+		 $query = "select * from CSRSS_Employees join CSRSS_Users using(username) order by employeeID asc";
+		 $result = mysql_query($query,$this->db);
+
+		 if(!$result) return $resp;
+
+  		 	while ($record = mysql_fetch_array($result,MYSQL_ASSOC)) {
+  		 		$resp = array();
+  		 		$resp['username'] = $record['username'];
+  		 		$resp['online_fee'] = $record['online_fee'];
+  		 		$resp['service_fee'] = $record['service_fee'];
+  		 		$resp['isAdmin'] = $record['isAdmin'];
+  		 		$resp['firstName'] = $record['firstName'];
+  		 		$resp['lastName'] = $record['lastName'];
+  		 		$resp['first_day_of_work'] = $record['first_day_of_work'];
+  		 		$resp['base_salary'] = $record['base_salary'];
+  		 		$resp['address'] = $record['address'];
+  		 		$resp['phone'] = $record['phone'];
+  		 		$answer[$record['employeeID']] = $resp;
+  			}
+
+  		 return $answer;
+	}
+
+	function getAllInfoForEmployee($employeeID)
+	{
+		$resp = array();
+
+		 $query = "select * from CSRSS_Employees join CSRSS_Users using(username) where employeeID='$employeeID'";
+		 $result = mysql_query($query,$this->db);
+
+		 if(!$result) return $resp;
+
+  		 $record = mysql_fetch_array($result,MYSQL_ASSOC);
+  		 $resp['employeeID'] = $record['employeeID'];
+  		 $resp['username'] = $record['username'];
+  		 $resp['last_login'] = $record['last_login'];
+  		 $resp['online_fee'] = $record['online_fee'];
+  		 $resp['service_fee'] = $record['service_fee'];
+  		 $resp['isAdmin'] = $record['isAdmin'];
+  		 $resp['firstName'] = $record['firstName'];
+  		 $resp['lastName'] = $record['lastName'];
+  		 $resp['first_day_of_work'] = $record['first_day_of_work'];
+  		 $resp['base_salary'] = $record['base_salary'];
+  		 $resp['address'] = $record['address'];
+  		 $resp['phone'] = $record['phone'];
+
+	  	 return $resp;
+	}
+
+	function addNewEmployee($employeeID,$username,$onlinefee,$isAdmin,$firstName,$lastName,$firstDayWork,$baseSalary,$address,$phone) {
+	
+		$resp = "ERROR";
+
+		if ($address != "NULL") {
+         	$address = '"' . $address . '"';
+        }
+
+        if ($phone != "NULL") {
+         	$phone = '"' . $phone . '"';
+        }
+
+         $query = "insert into CSRSS_Employees (employeeID,username,online_fee,isAdmin,firstName,lastName,first_day_of_work,base_salary,address,phone) values (";
+		 $query .= "'$employeeID','$username',$onlinefee,$isAdmin,'$firstName','$lastName','$firstDayWork',$baseSalary," . $address . "," . $phone . ")";
+		 
+		 $result = mysql_query($query,$this->db);
+		 $rows = mysql_affected_rows($this->db);
+		 if($rows == 1) {
+				
+				$resp = "Employee added successfully to Employees database ";
+			 	//This function also adds an entry to the Users table:
+				$query = "insert into CSRSS_Users (username) values ('$username')";
+		 		$result = mysql_query($query,$this->db);
+		 		$rows = mysql_affected_rows($this->db);
+				if($rows == 1) $resp .= "and new username added to the Users database. New user can login with default password now!";
+		 		else $resp .= "; however, we couldn't create a default login for this user. Please, update the Users table manually.";
+		 }
+
+		 return $resp;
+	}
+
+	function updateEmployee($employeeID,$onlinefee,$servicefee,$isAdmin,$firstName,$lastName,$firstDayWork,$baseSalary,$address,$phone) {
+	
+		if ($address != "NULL") {
+         	$address = '"' . $address . '"';
+        }
+
+        if ($phone != "NULL") {
+         	$phone = '"' . $phone . '"';
+        }
+
+		 $query = "update CSRSS_Employees set online_fee=$onlinefee, service_fee=$servicefee, isAdmin=$isAdmin, firstName='$firstName'";
+		 $query .= ", lastName='$lastName', first_day_of_work='$firstDayWork', base_salary=$baseSalary";
+		 $query .= ", address=" . $address . ", phone=" . $phone ;
+		 $query .= " where employeeID='$employeeID'";
+
+		 $result = mysql_query($query,$this->db);
+		 $rows = mysql_affected_rows($this->db);
+
+		 if($rows == 1) return "Employee $employeeID successfully updated in Employees database. ";
+		 else if($rows == 0) return "Nothing to update for $employeeID in Employees database. ";
+		 else return "ERROR";
+	}
+
+
 	function getAllEmployees()
 	{
 		 $resp = array();

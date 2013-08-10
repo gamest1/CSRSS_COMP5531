@@ -15,7 +15,7 @@ class LoginController {
 	{
 		
 				if($this->model->login($username,$password)) {
-					//Good!! You logged in! //Create the session, etc... 
+					//Good!! You logged in! 
 					$tmp = new Parts();
 					$parts = $tmp->getAllParts();
 					include '../views/mainView.php';

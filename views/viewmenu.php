@@ -42,7 +42,7 @@ else {
 
                echo '<li class="nav-header">Admin</li>';
 
-               for($i=10;$i<14;$i++) {
+               for($i=10;$i<15;$i++) {
 
                  if($i==$activeIndex) echo '<li class="active">';
                  else echo '<li>';
@@ -55,9 +55,12 @@ else {
                      echo '<a href="../controllers/menuUpdateEmployeesController.php">Update/Add Employees</a></li>';
                      break;
                   case 12:
+                     echo '<a href="../controllers/menuDailyActivityController.php">Daily Activity</a></li>';
+                     break;
+                  case 13:
                      echo '<a href="../controllers/menuEmployeeReportController.php">Employee Report</a></li>';
                      break; 
-                  case 13:
+                  case 14:
                      echo '<a href="../controllers/menuStoreReportController.php">Store Report</a></li>';
                      break;       
                  }

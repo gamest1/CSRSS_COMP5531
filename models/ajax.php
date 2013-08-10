@@ -1,5 +1,6 @@
 <?php
 include_once("../models/employees.php");
+include_once("../models/service.php");
 
 class Ajax {
 
@@ -12,6 +13,39 @@ class Ajax {
     
     if($tmp != "ERROR") $resp['string'] = $tmp;
     else $resp['string'] = "ERROR";
+
+    return json_encode($resp);
+
+  }
+
+  function getStoreReport($startDate,$endDate) {
+
+    $model = new Service();
+    $tmp = $model->getStoreReport($startDate,$endDate);
+
+    $resp = array('report' => $tmp);
+
+    return json_encode($resp);
+  
+  }
+
+  function getServiceHistoryForEmployee($employeeID,$startDate,$endDate) {
+
+    $model = new Service();
+    $tmp = $model->getServiceHistoryForEmployee($employeeID,$startDate,$endDate);
+
+    $resp = array('historia' => $tmp);
+
+    return json_encode($resp);
+  
+  }
+
+  function fetchDailyActivityForDay($date) {
+  
+    $model = new Service();
+    $tmp = $model->fetchDailyActivityForDay($date);
+
+    $resp = array('activity' => $tmp);
 
     return json_encode($resp);
 
@@ -126,6 +160,17 @@ class Ajax {
 	}
 
 
+
+  function getAllInfoForEmployee($employeeID)
+  {
+
+    $model = new Employees();
+    $tmp = $model->getAllInfoForEmployee($employeeID);
+
+    return json_encode($tmp);
+  }
+
+   
   function getAllInfoForPart($partID)
   {
     $resp = array();
@@ -259,7 +304,10 @@ if(isset($_POST['action'])) {
        		break;
        case "getAllInfoForPart":
           echo $controller->getAllInfoForPart($_POST['partID']);
-          break;   
+          break;
+       case "getAllInfoForEmployee":
+          echo $controller->getAllInfoForEmployee($_POST['employeeID']);
+          break;      
        case "getPartsInCategory":
        		echo $controller->getPartsInCategory($_POST['category']);
        		break;		
@@ -271,6 +319,15 @@ if(isset($_POST['action'])) {
           break; 
        case "getAllPaymentsForEmployee":
           echo $controller->getAllPaymentsForEmployee($_POST['employee']);
+          break;   
+       case "fetchDailyActivityForDay":
+          echo $controller->fetchDailyActivityForDay($_POST['date']);
+          break;  
+       case "getServiceHistoryForEmployee":
+          echo $controller->getServiceHistoryForEmployee($_POST['employee'],$_POST['dateBeg'],$_POST['dateEnd']);
+          break;
+       case "getStoreReport":
+          echo $controller->getStoreReport($_POST['dateBeg'],$_POST['dateEnd']);
           break;            			
        default:
            echo "{\"status\":\"error: unknown action name\"}";

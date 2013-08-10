@@ -67,8 +67,8 @@ for($i=0;$i<count($parts['ids']);$i++) {
         <label class="control-label">Part ID</label>
         <input type="text" <? if(isset($content['newPartID'])) echo 'value="' . $content['newPartID'] . '"'; ?> 
         placeholder="Input 10 digits here" class="ctrl-textbox" name="newPartID" id="newPartID"
-        onkeydown="check10digits();" onpaste="check10digits();" oninput="check10digits();">
-        <input type="button" id="firstButton" onclick="createNewPartID();" value="Create New Inventory Part" disabled>
+        onkeydown="checkDigits(10,this);" onpaste="checkDigits(10,this);" oninput="checkDigits(10,this);">
+        <input type="button" id="firstButton" onclick="createNewID();" value="Create New Inventory Part" disabled>
       </div>
 
       <div class="droppedField" id="partCategoryDIV" style="display: none;">
