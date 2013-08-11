@@ -21,7 +21,7 @@ for($i=0;$i<count($inventory);$i++) {
                 $partID = $rowHash['partID'];
                 $part_type = $rowHash['part_type'];
                 $row .= "<tr>";
-                $row .= "<td><a href=\"menuSearchPartsController.php?partID=$partID&part_type=$part_type\">";
+                $row .= "<td><a href=\"javascript:fetchPurchaseHistory($partID);\">";
                 $row .= "$partID</a></td><td>" . $rowHash['partName'] . "</td>";
                 $row .= "<td>$part_type</td><td>" . $rowHash['numberSold'] . "</td>";
                 $row .= "<td>" . $rowHash['numberAvailable'] . "</td>";
@@ -47,7 +47,18 @@ $tableView .= "</table>";
     </div>
     <div class="span10">
       <!--Body content-->
+
+      <div id="purchaseHistory" style="display: none;"> 
+        <div id="purchaseHistoryTable"></div>
+      </div>
+
       <h2>Inventory</h2>
+      
+      <div id="ajaxLoad" style="display: none;">
+              <label class="control-label">Please wait while we run your query...</label>
+              <img src="../assets/img/ajax-loader.gif" alt="Please wait..." height="32" width="32">
+      </div>
+      
       <hr>
        <? echo $tableView; ?>
 

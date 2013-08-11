@@ -274,6 +274,29 @@ class Parts {
 
 	}
 
+
+	function fetchPurchaseHistory($partID) {
+
+		 $tmp = array();
+
+		 $query = "select * from CSRSS_PurchaseHistory where partID='$partID' order by purchase_date asc";
+		 $result = mysql_query($query,$this->db);
+	
+		 if(!$result) return $tmp;
+
+            $i = 0;
+  		 	while ($record = mysql_fetch_array($result,MYSQL_ASSOC)) {
+  		 		$tmp2 = array();
+  		 		$tmp2['partID'] = $record['partID'];
+  		 		$tmp2['purchase_date'] = $record['purchase_date'];
+  		 		$tmp2['units'] = $record['units'];
+  		 		$tmp[$i] = $tmp2;
+  		 		$i++;
+  			}
+
+  		 return $tmp;
+	}
+
 	function getInventory()
 	{
 		$tmp = array();

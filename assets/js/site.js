@@ -18,6 +18,54 @@ function loadDatePickers() {
 	  });
 }
 
+function fetchPurchaseHistory(part) {
+	$('#purchaseHistory').hide();
+	var postData = {
+    	action: "fetchPurchaseHistory",
+    	partID: part
+	 };
+
+	 $('#ajaxLoad').show();
+
+	 $.post("https://clipper.encs.concordia.ca/~kxc55311/models/ajax.php", postData,
+  	   function(data){
+    	
+      $('#ajaxLoad').hide();
+
+	  var results = data.historia;
+	  var lim = results.length;
+
+	  if(lim > 0) {
+
+   	 	var tableView = "<h2>Purchase History for part# " + results[0]['partID']  + ":</h2>"; 
+   	 	tableView +='<table class="table table-striped table-bordered table-hover">';
+		tableView += "<tr><th>Purchase Date</th><th>Units Purchased</th></tr>";
+
+		for(var i=0;i<lim;i++) { 
+				var row = "";
+                var rowHash = results[i];
+                row += "<tr>";
+                row += '<td>' + rowHash['purchase_date'] + "</td>";
+                row += '<td>' + rowHash['units'] + "</td>";
+                row += "</tr>";
+
+                tableView += row;    
+		}
+
+		tableView += "</table>";
+
+   	 	$('#purchaseHistoryTable').html(tableView);
+   	  }
+   	  else {
+   	  	$('#purchaseHistoryTable').html("<h3>There is no purchase history avaiable for the product you selected!<h3>");
+   	  } 
+
+	  $('#purchaseHistory').show();
+
+  	  }, "json");
+
+}
+
 function fetchStoreReport(caller) {
 	if( $(caller).val() == "both" ) {
 		$('#inStoreRow').show();
@@ -146,6 +194,8 @@ function fetchEmployeeReport() {
 
                 tableView += row;    
 		}
+
+		tableView += "</table>";
    	 	$('#employeeReport').html(tableView);
    	  }
    	  else {
@@ -194,6 +244,8 @@ function fetchDailyActivity() {
 
                 tableView += row;    
 		}
+
+		tableView += "</table>";
    	 	$('#dailyReport').html(tableView);
    	  }
    	  else {

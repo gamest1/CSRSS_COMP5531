@@ -1,6 +1,7 @@
 <?php
 include_once("../models/employees.php");
 include_once("../models/service.php");
+include_once("../models/parts.php");
 
 class Ajax {
 
@@ -33,6 +34,17 @@ class Ajax {
 
     $model = new Service();
     $tmp = $model->getServiceHistoryForEmployee($employeeID,$startDate,$endDate);
+
+    $resp = array('historia' => $tmp);
+
+    return json_encode($resp);
+  
+  }
+
+  function fetchPurchaseHistory($partID) {
+
+    $model = new Parts();
+    $tmp = $model->fetchPurchaseHistory($partID);
 
     $resp = array('historia' => $tmp);
 
@@ -328,7 +340,10 @@ if(isset($_POST['action'])) {
           break;
        case "getStoreReport":
           echo $controller->getStoreReport($_POST['dateBeg'],$_POST['dateEnd']);
-          break;            			
+          break;  
+       case "fetchPurchaseHistory":
+          echo $controller->fetchPurchaseHistory($_POST['partID']);
+          break;  
        default:
            echo "{\"status\":\"error: unknown action name\"}";
             break;
