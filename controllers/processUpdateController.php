@@ -206,7 +206,7 @@ else
                     else {
                       $purchaseDate = $post_array['purchaseDate'];
                       //Add it to CSRSS_PurchaseHistory:
-                      $message .= $controller->model->addPartToPurchaseHistory($partID,$purchaseDate,$numberAvailable) . "<br />";
+                      $message .= $controller->model->addPartToPurchaseHistory($partID,$purchaseDate,$numberAvailable,$wholePrice) . "<br />";
                     }
                   }       
                }

@@ -56,10 +56,10 @@ class Parts {
 
 	}
 
-	function addPartToPurchaseHistory($partID,$purchaseDate,$units) {
+	function addPartToPurchaseHistory($partID,$purchaseDate,$units,$unit_price) {
 
-		 $query = "insert into CSRSS_PurchaseHistory (partID,purchase_date,units) values ";
-		 $query .= "('$partID','$purchaseDate',$units)";
+		 $query = "insert into CSRSS_PurchaseHistory (partID,purchase_date,units,unit_price) values ";
+		 $query .= "('$partID','$purchaseDate',$units,$unit_price)";
 		 
 		 $result = mysql_query($query,$this->db);
 		 $rows = mysql_affected_rows($this->db);
@@ -81,8 +81,8 @@ class Parts {
   		 if($total<$numberAvailable) {
   		 	 //We have a new purchase! Add difference to purchase history:
   		 	$diff = $numberAvailable - $total;
-		    $query = "insert into CSRSS_PurchaseHistory (partID,purchase_date,units) values ";
-		 	$query .= "('$partID','$purchaseDate'," . intval($diff) . ")";
+		    $query = "insert into CSRSS_PurchaseHistory (partID,purchase_date,units,unit_price) values ";
+		 	$query .= "('$partID','$purchaseDate'," . intval($diff) . ",$wholePrice)";
 		 	$result = mysql_query($query,$this->db);
  			$rows = mysql_affected_rows($this->db);
  			if($rows == 1) $resp .= "New purchase! Purchase History successfully updated for $partID. ";
@@ -290,6 +290,7 @@ class Parts {
   		 		$tmp2['partID'] = $record['partID'];
   		 		$tmp2['purchase_date'] = $record['purchase_date'];
   		 		$tmp2['units'] = $record['units'];
+  		 		$tmp2['unit_price'] = $record['unit_price'];
   		 		$tmp[$i] = $tmp2;
   		 		$i++;
   			}

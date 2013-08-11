@@ -207,6 +207,8 @@ class Ajax {
        $resp['installation_cost'] = $record['installation_cost'];
        $resp['numberSold'] = $record['numberSold'];      
        $resp['numberAvailable'] = $record['numberAvailable'];
+
+       //The Inventory table has the last whole_price paid for this item!
        $resp['whole_price'] = $record['whole_price'];
 
        $part_type = $record['part_type'];

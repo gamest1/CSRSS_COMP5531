@@ -39,7 +39,7 @@ function fetchPurchaseHistory(part) {
 
    	 	var tableView = "<h2>Purchase History for part# " + results[0]['partID']  + ":</h2>"; 
    	 	tableView +='<table class="table table-striped table-bordered table-hover">';
-		tableView += "<tr><th>Purchase Date</th><th>Units Purchased</th></tr>";
+		tableView += "<tr><th>Purchase Date</th><th>Units Purchased</th><th>Unitary Price</th></tr>";
 
 		for(var i=0;i<lim;i++) { 
 				var row = "";
@@ -47,6 +47,7 @@ function fetchPurchaseHistory(part) {
                 row += "<tr>";
                 row += '<td>' + rowHash['purchase_date'] + "</td>";
                 row += '<td>' + rowHash['units'] + "</td>";
+                row += '<td>' + rowHash['unit_price'] + "</td>";
                 row += "</tr>";
 
                 tableView += row;    

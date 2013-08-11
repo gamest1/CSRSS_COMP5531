@@ -167,9 +167,26 @@ class Service {
           //Reduce inventory by one!
   		 $total--; 
   		 $sold++;
+        
+       $wholePrice = $record['whole_price'];
+         //Determine the real whole_price paid by the store owner for the item being sold:
+         //This is done through the purchase history. Most expensive price sells first.
 
+         $query = "select units, unit_price from CSRSS_PurchaseHistory where partID = '$partID' order by unit_price desc";
+         $result = mysql_query($query,$this->db);
 
-         $wholePrice = $record['whole_price'];
+         if(!$result) {
+           ;
+         }
+         else {
+            $acc = 0;
+             while ($record = mysql_fetch_array($result,MYSQL_ASSOC)) {
+               $acc += intval($record['units']);
+               $wholePrice = $record['unit_price'];
+               if($acc >= $sold) break;
+             } 
+         }
+
          $storeRevenue = $cost-$wholePrice;
          $employeeAmount = 0;
 
