@@ -49,9 +49,6 @@ else {
         <h2 class="form-signin-heading">Log in to Esteban's Computer Store System</h2>
         <input type="text" class="input-block-level" name="username" placeholder="Username">
         <input type="password" class="input-block-level" name="password" placeholder="Password">
-        <label class="checkbox">
-          <input type="checkbox" name="remember" value="remember-me"> Remember me
-        </label>
         <button class="btn btn-large btn-primary" type="submit">Log in</button>
       </form>
 
